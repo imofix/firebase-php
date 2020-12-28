@@ -57,13 +57,10 @@ class ImportUserRecord implements \JsonSerializable
         return new self();
     }
 
-    /**
-     * @return static
-     */
-    public function withUid(Uid $uid): self
+    public function withUid(string $uid): self
     {
         $request = clone $this;
-        $request->uid = $uid;
+        $request->uid = new Uid($uid);
 
         return $request;
     }
