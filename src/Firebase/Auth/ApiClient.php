@@ -220,6 +220,26 @@ class ApiClient implements ClientInterface
         );
     }
 
+    public function deleteUsers(array $uids, array $options, ProjectId $projectId): ResponseInterface
+    {
+        return $this->requestApi(
+            sprintf(
+                'POST https://identitytoolkit.googleapis.com/v1/projects/%s/accounts:batchDelete',
+                $projectId->value()
+            ),
+            array_filter(
+                [
+                    'localIds' => $uids,
+                    'force' => $options['force'] ?? null,
+                    'tenantId' => $options['tenantId'] ?? null,
+                ]
+            ),
+            [
+                'access_token_auth' => true,
+            ]
+        );
+    }
+
     /**
      * @param array<mixed> $data
      * @param array<mixed> $headers
