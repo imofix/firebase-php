@@ -974,6 +974,15 @@ class Auth
     }
 
     /**
+     * @param array<Uid|string> $uids
+     * @param array<string, string|int> $options Import options.
+     */
+    public function deleteUsers(array $uids, array $options): void
+    {
+        $this->client->deleteUsers($uids, $options, $this->projectId);
+    }
+
+    /**
      * Gets the user ID from the response and queries a full UserRecord object for it.
      *
      * @throws Exception\AuthException
