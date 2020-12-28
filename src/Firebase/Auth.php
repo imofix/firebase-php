@@ -108,7 +108,7 @@ class Auth
     {
         $userRecords = $this->getUsers([$uid]);
 
-        if ($userRecord = $userRecords[(string)$uid] ?? null) {
+        if ($userRecord = $userRecords[(string) $uid] ?? null) {
             return $userRecord;
         }
 
@@ -118,24 +118,24 @@ class Auth
     /**
      * @param array<Uid|string> $uids
      *
-     * @return array<string, UserRecord|null>
      * @throws Exception\FirebaseException
-     *
      * @throws Exception\AuthException
+     *
+     * @return array<string, UserRecord|null>
      */
     public function getUsers(array $uids): array
     {
         $uids = \array_map(static function ($uid) {
             $uid = $uid instanceof Uid ? $uid : new Uid($uid);
 
-            return (string)$uid;
+            return (string) $uid;
         }, $uids);
 
         $users = \array_fill_keys($uids, null);
 
         $response = $this->client->getAccountInfo($uids);
 
-        $data = JSON::decode((string)$response->getBody(), true);
+        $data = JSON::decode((string) $response->getBody(), true);
 
         foreach ($data['users'] ?? [] as $userData) {
             $userRecord = UserRecord::fromResponseData($userData);
@@ -146,10 +146,10 @@ class Auth
     }
 
     /**
-     * @return Traversable<UserRecord>|UserRecord[]
      * @throws Exception\FirebaseException
-     *
      * @throws Exception\AuthException
+     *
+     * @return Traversable<UserRecord>|UserRecord[]
      */
     public function listUsers(int $maxResults = 1000, int $batchSize = 1000): Traversable
     {
@@ -158,9 +158,9 @@ class Auth
 
         do {
             $response = $this->client->downloadAccount($batchSize, $pageToken);
-            $result = JSON::decode((string)$response->getBody(), true);
+            $result = JSON::decode((string) $response->getBody(), true);
 
-            foreach ((array)($result['users'] ?? []) as $userData) {
+            foreach ((array) ($result['users'] ?? []) as $userData) {
                 yield UserRecord::fromResponseData($userData);
 
                 if (++$count === $maxResults) {
@@ -239,9 +239,9 @@ class Auth
     {
         $email = $email instanceof Email ? $email : new Email($email);
 
-        $response = $this->client->getUserByEmail((string)$email);
+        $response = $this->client->getUserByEmail((string) $email);
 
-        $data = JSON::decode((string)$response->getBody(), true);
+        $data = JSON::decode((string) $response->getBody(), true);
 
         if (empty($data['users'][0])) {
             throw new UserNotFound("No user with email '{$email}' found.");
@@ -260,9 +260,9 @@ class Auth
     {
         $phoneNumber = $phoneNumber instanceof PhoneNumber ? $phoneNumber : new PhoneNumber($phoneNumber);
 
-        $response = $this->client->getUserByPhoneNumber((string)$phoneNumber);
+        $response = $this->client->getUserByPhoneNumber((string) $phoneNumber);
 
-        $data = JSON::decode((string)$response->getBody(), true);
+        $data = JSON::decode((string) $response->getBody(), true);
 
         if (empty($data['users'][0])) {
             throw new UserNotFound("No user with phone number '{$phoneNumber}' found.");
@@ -338,7 +338,7 @@ class Auth
         $uid = $uid instanceof Uid ? $uid : new Uid($uid);
 
         try {
-            $this->client->deleteUser((string)$uid);
+            $this->client->deleteUser((string) $uid);
         } catch (UserNotFound $e) {
             throw new UserNotFound("No user with uid '{$uid}' found.");
         }
@@ -489,14 +489,14 @@ class Auth
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
+     *
      * @deprecated 5.4.0 use {@see setCustomUserClaims}($id, array $claims) instead
      * @see setCustomUserClaims
      * @codeCoverageIgnore
-     *
      */
     public function setCustomUserAttributes($uid, array $attributes): UserRecord
     {
-        Deprecation::trigger(__METHOD__, __CLASS__ . '::setCustomUserClaims($uid, $claims)');
+        Deprecation::trigger(__METHOD__, __CLASS__.'::setCustomUserClaims($uid, $claims)');
 
         $this->setCustomUserClaims($uid, $attributes);
 
@@ -508,13 +508,13 @@ class Auth
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
-     * @see removeCustomUserClaims
      *
+     * @see removeCustomUserClaims
      * @deprecated 5.4.0 use {@see setCustomUserClaims}($uid) instead
      */
     public function deleteCustomUserAttributes($uid): UserRecord
     {
-        Deprecation::trigger(__METHOD__, __CLASS__ . '::setCustomUserClaims($uid, null)');
+        Deprecation::trigger(__METHOD__, __CLASS__.'::setCustomUserClaims($uid, null)');
 
         $this->setCustomUserClaims($uid, null);
 
@@ -534,7 +534,7 @@ class Auth
      */
     public function setCustomUserClaims($uid, ?array $claims): void
     {
-        $uid = $uid instanceof Uid ? (string)$uid : $uid;
+        $uid = $uid instanceof Uid ? (string) $uid : $uid;
         $claims = $claims ?? [];
 
         $this->client->setCustomUserClaims($uid, $claims);
@@ -556,7 +556,7 @@ class Auth
         try {
             return Configuration::forUnsecuredSigner()->parser()->parse($tokenString);
         } catch (Throwable $e) {
-            throw new InvalidArgumentException('The given token could not be parsed: ' . $e->getMessage());
+            throw new InvalidArgumentException('The given token could not be parsed: '.$e->getMessage());
         }
     }
 
@@ -612,9 +612,9 @@ class Auth
             }
 
             $tokenAuthenticatedAt = DT::toUTCDateTimeImmutable($verifiedToken->claims()->get('auth_time'));
-            $tokenAuthenticatedAtWithLeeway = $tokenAuthenticatedAt->modify('-' . $leewayInSeconds . ' seconds');
+            $tokenAuthenticatedAtWithLeeway = $tokenAuthenticatedAt->modify('-'.$leewayInSeconds.' seconds');
 
-            $validSinceWithLeeway = DT::toUTCDateTimeImmutable($validSince)->modify('-' . $leewayInSeconds . ' seconds');
+            $validSinceWithLeeway = DT::toUTCDateTimeImmutable($validSince)->modify('-'.$leewayInSeconds.' seconds');
 
             if ($tokenAuthenticatedAtWithLeeway < $validSinceWithLeeway) {
                 throw new RevokedIdToken($verifiedToken);
@@ -656,7 +656,7 @@ class Auth
     {
         $response = $this->client->verifyPasswordResetCode($oobCode);
 
-        $email = JSON::decode((string)$response->getBody(), true)['email'];
+        $email = JSON::decode((string) $response->getBody(), true)['email'];
 
         return new Email($email);
     }
@@ -706,9 +706,9 @@ class Auth
     ): Email {
         $newPassword = $newPassword instanceof ClearTextPassword ? $newPassword : new ClearTextPassword($newPassword);
 
-        $response = $this->client->confirmPasswordReset($oobCode, (string)$newPassword);
+        $response = $this->client->confirmPasswordReset($oobCode, (string) $newPassword);
 
-        $email = JSON::decode((string)$response->getBody(), true)['email'];
+        $email = JSON::decode((string) $response->getBody(), true)['email'];
 
         if ($invalidatePreviousSessions) {
             $this->revokeRefreshTokens($this->getUserByEmail($email)->uid);
@@ -732,7 +732,7 @@ class Auth
     {
         $uid = $uid instanceof Uid ? $uid : new Uid($uid);
 
-        $this->client->revokeRefreshTokens((string)$uid);
+        $this->client->revokeRefreshTokens((string) $uid);
     }
 
     /**
@@ -747,9 +747,9 @@ class Auth
         $uid = $uid instanceof Uid ? $uid : new Uid($uid);
         $provider = \array_map(static function ($provider) {
             return $provider instanceof Provider ? $provider : new Provider($provider);
-        }, (array)$provider);
+        }, (array) $provider);
 
-        $response = $this->client->unlinkProvider((string)$uid, $provider);
+        $response = $this->client->unlinkProvider((string) $uid, $provider);
 
         return $this->getUserRecordFromResponse($response);
     }
@@ -763,7 +763,7 @@ class Auth
     public function signInAsUser($user, ?array $claims = null): SignInResult
     {
         $claims = $claims ?? [];
-        $uid = $user instanceof UserRecord ? $user->uid : (string)$user;
+        $uid = $user instanceof UserRecord ? $user->uid : (string) $user;
 
         $customToken = $this->createCustomToken($uid, $claims);
 
@@ -816,8 +816,8 @@ class Auth
      */
     public function signInWithEmailAndPassword($email, $clearTextPassword): SignInResult
     {
-        $email = $email instanceof Email ? (string)$email : $email;
-        $clearTextPassword = $clearTextPassword instanceof ClearTextPassword ? (string)$clearTextPassword : $clearTextPassword;
+        $email = $email instanceof Email ? (string) $email : $email;
+        $clearTextPassword = $clearTextPassword instanceof ClearTextPassword ? (string) $clearTextPassword : $clearTextPassword;
 
         $action = SignInWithEmailAndPassword::fromValues($email, $clearTextPassword);
 
@@ -836,7 +836,7 @@ class Auth
      */
     public function signInWithEmailAndOobCode($email, $oobCode): SignInResult
     {
-        $email = $email instanceof Email ? (string)$email : $email;
+        $email = $email instanceof Email ? (string) $email : $email;
 
         $action = SignInWithEmailAndOobCode::fromValues($email, $oobCode);
 
@@ -903,11 +903,11 @@ class Auth
         $redirectUrl = null,
         ?string $oauthTokenSecret = null
     ): SignInResult {
-        $provider = $provider instanceof Provider ? (string)$provider : $provider;
+        $provider = $provider instanceof Provider ? (string) $provider : $provider;
         $redirectUrl = $redirectUrl ?? 'http://localhost';
 
         if ($redirectUrl instanceof UriInterface) {
-            $redirectUrl = (string)$redirectUrl;
+            $redirectUrl = (string) $redirectUrl;
         }
 
         if ($oauthTokenSecret) {
@@ -937,7 +937,7 @@ class Auth
      */
     public function signInWithIdpIdToken($provider, $idToken, $redirectUrl = null): SignInResult
     {
-        $provider = $provider instanceof Provider ? (string)$provider : $provider;
+        $provider = $provider instanceof Provider ? (string) $provider : $provider;
 
         if ($idToken instanceof Token) {
             $idToken = $idToken->toString();
@@ -946,7 +946,7 @@ class Auth
         $redirectUrl = $redirectUrl ?? 'http://localhost';
 
         if ($redirectUrl instanceof UriInterface) {
-            $redirectUrl = (string)$redirectUrl;
+            $redirectUrl = (string) $redirectUrl;
         }
 
         $action = SignInWithIdpCredentials::withIdToken($provider, $idToken);
@@ -965,7 +965,7 @@ class Auth
     /**
      * @see https://cloud.google.com/identity-platform/docs/reference/rest/v1/projects.accounts/batchCreate
      *
-     * @param array<string, string|int> $options Import options.
+     * @param array<string, string|int> $options
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
@@ -979,14 +979,14 @@ class Auth
      * @see https://cloud.google.com/identity-platform/docs/reference/rest/v1/projects.accounts/batchDelete
      *
      * @param array<Uid|string> $uids
-     * @param array<string, string|int> $options Import options.
+     * @param array<string, string|int> $options
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
      */
     public function deleteUsers(array $uids, array $options): void
     {
-        $uids = array_map(
+        $uids = \array_map(
             static function ($uid): string {
                 return $uid instanceof Uid ? $uid->__toString() : $uid;
             },
@@ -1004,7 +1004,7 @@ class Auth
      */
     private function getUserRecordFromResponse(ResponseInterface $response): UserRecord
     {
-        $uid = JSON::decode((string)$response->getBody(), true)['localId'];
+        $uid = JSON::decode((string) $response->getBody(), true)['localId'];
 
         return $this->getUser($uid);
     }
