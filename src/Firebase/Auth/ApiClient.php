@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreait\Firebase\Auth;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\RequestOptions;
 use Kreait\Firebase\Exception\Auth\EmailNotFound;
 use Kreait\Firebase\Exception\Auth\ExpiredOobCode;
 use Kreait\Firebase\Exception\Auth\InvalidOobCode;
@@ -14,6 +15,7 @@ use Kreait\Firebase\Exception\AuthApiExceptionConverter;
 use Kreait\Firebase\Exception\AuthException;
 use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Http\WrappedGuzzleClient;
+use Kreait\Firebase\Project\ProjectId;
 use Kreait\Firebase\Request;
 use Kreait\Firebase\Value\Provider;
 use Psr\Http\Message\ResponseInterface;
@@ -70,7 +72,7 @@ class ApiClient implements ClientInterface
     {
         return $this->requestApi('https://identitytoolkit.googleapis.com/v1/accounts:update', [
             'localId' => $uid,
-            'customAttributes' => \json_encode((object) $claims),
+            'customAttributes' => \json_encode((object)$claims),
         ]);
     }
 
@@ -198,12 +200,34 @@ class ApiClient implements ClientInterface
     }
 
     /**
-     * @param array<mixed> $data
+     * @param array<array<string|int>> $users The users to import
+     * @param array<array<string|int>> $options Import options. Used to specify how passwords are hashed for example
      *
      * @throws AuthException
      * @throws FirebaseException
      */
-    private function requestApi(string $uri, array $data): ResponseInterface
+    public function importUsers(Request\ImportUsers $users, array $options, ProjectId $projectId): ResponseInterface
+    {
+        return $this->requestApi(
+            sprintf(
+                'https://identitytoolkit.googleapis.com/v1/projects/%s/accounts:batchCreate',
+                $projectId->value()
+            ),
+            array_merge($users->jsonSerialize(), $options),
+            [
+                'access_token_auth' => true,
+            ]
+        );
+    }
+
+    /**
+     * @param array<mixed> $data
+     * @param array<mixed> $headers
+     *
+     * @throws AuthException
+     * @throws FirebaseException
+     */
+    private function requestApi(string $uri, array $data, ?array $headers = null): ResponseInterface
     {
         $options = [];
 
@@ -213,6 +237,10 @@ class ApiClient implements ClientInterface
 
         if (!empty($data)) {
             $options['json'] = $data;
+        }
+
+        if ($headers !== null) {
+            $options[RequestOptions::HEADERS] = $headers;
         }
 
         try {
