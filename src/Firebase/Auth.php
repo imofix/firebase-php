@@ -963,6 +963,8 @@ class Auth
     }
 
     /**
+     * @see https://cloud.google.com/identity-platform/docs/reference/rest/v1/projects.accounts/batchCreate
+     *
      * @param array<string, string|int> $options Import options.
      *
      * @throws Exception\AuthException
@@ -974,11 +976,23 @@ class Auth
     }
 
     /**
+     * @see https://cloud.google.com/identity-platform/docs/reference/rest/v1/projects.accounts/batchDelete
+     *
      * @param array<Uid|string> $uids
      * @param array<string, string|int> $options Import options.
+     *
+     * @throws Exception\AuthException
+     * @throws Exception\FirebaseException
      */
     public function deleteUsers(array $uids, array $options): void
     {
+        $uids = array_map(
+            static function ($uid): string {
+                return $uid instanceof Uid ? $uid->__toString() : $uid;
+            },
+            $uids
+        );
+
         $this->client->deleteUsers($uids, $options, $this->projectId);
     }
 

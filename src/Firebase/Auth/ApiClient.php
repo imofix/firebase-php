@@ -220,6 +220,13 @@ class ApiClient implements ClientInterface
         );
     }
 
+    /**
+     * @param array<string> $uids
+     * @param array<string, string|bool> $options
+     *
+     * @throws AuthException
+     * @throws FirebaseException
+     */
     public function deleteUsers(array $uids, array $options, ProjectId $projectId): ResponseInterface
     {
         return $this->requestApi(
