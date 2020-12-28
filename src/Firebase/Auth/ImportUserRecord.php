@@ -15,22 +15,22 @@ use Kreait\Firebase\Value\Url;
 class ImportUserRecord implements \JsonSerializable
 {
     /** @var Uid|null */
-    private $uid = null;
+    private $uid;
 
     /** @var Email|null */
-    private $email = null;
+    private $email;
 
     /** @var bool|null */
-    private $emailVerified = null;
+    private $emailVerified;
 
     /** @var string|null */
-    private $displayName = null;
+    private $displayName;
 
     /** @var Url|null */
-    private $photoUrl = null;
+    private $photoUrl;
 
     /** @var PhoneNumber|null */
-    private $phoneNumber = null;
+    private $phoneNumber;
 
     /** @var array<string, mixed> */
     private $customClaims = [];
@@ -165,6 +165,7 @@ class ImportUserRecord implements \JsonSerializable
 
     /**
      * @param array<UserInfo> $providers
+     *
      * @return $this
      */
     public function withProviders(array $providers): self
@@ -189,7 +190,7 @@ class ImportUserRecord implements \JsonSerializable
             $disableUser = false;
         }
 
-        $customClaims = count($this->customClaims) > 0 ? JSON::encode($this->customClaims) : null;
+        $customClaims = \count($this->customClaims) > 0 ? JSON::encode($this->customClaims) : null;
         $tokensValidAfterTime = $this->tokensValidAfterTime !== null
             ? $this->tokensValidAfterTime->format(\DATE_ATOM)
             : null;
@@ -206,13 +207,13 @@ class ImportUserRecord implements \JsonSerializable
             'validSince' => $tokensValidAfterTime,
         ];
 
-        if (count($this->providers) > 0) {
+        if (\count($this->providers) > 0) {
             foreach ($this->providers as $providerData) {
                 $record['providerUserInfo'][] = $providerData->jsonSerialize();
             }
         }
 
-        return array_filter(
+        return \array_filter(
             $record,
             static function ($value) {
                 return $value !== null;

@@ -72,7 +72,7 @@ class ApiClient implements ClientInterface
     {
         return $this->requestApi('https://identitytoolkit.googleapis.com/v1/accounts:update', [
             'localId' => $uid,
-            'customAttributes' => \json_encode((object)$claims),
+            'customAttributes' => \json_encode((object) $claims),
         ]);
     }
 
@@ -209,11 +209,11 @@ class ApiClient implements ClientInterface
     public function importUsers(Request\ImportUsers $users, array $options, ProjectId $projectId): ResponseInterface
     {
         return $this->requestApi(
-            sprintf(
+            \sprintf(
                 'https://identitytoolkit.googleapis.com/v1/projects/%s/accounts:batchCreate',
                 $projectId->value()
             ),
-            array_merge($users->jsonSerialize(), $options),
+            \array_merge($users->jsonSerialize(), $options),
             [
                 'access_token_auth' => true,
             ]
@@ -230,11 +230,11 @@ class ApiClient implements ClientInterface
     public function deleteUsers(array $uids, array $options, ProjectId $projectId): ResponseInterface
     {
         return $this->requestApi(
-            sprintf(
+            \sprintf(
                 'POST https://identitytoolkit.googleapis.com/v1/projects/%s/accounts:batchDelete',
                 $projectId->value()
             ),
-            array_filter(
+            \array_filter(
                 [
                     'localIds' => $uids,
                     'force' => $options['force'] ?? null,
