@@ -200,13 +200,12 @@ class ApiClient implements ClientInterface
     }
 
     /**
-     * @param array<array<string|int>> $users The users to import
-     * @param array<array<string|int>> $options Import options. Used to specify how passwords are hashed for example
+     * @param array<string, mixed> $options
      *
      * @throws AuthException
      * @throws FirebaseException
      */
-    public function importUsers(Request\ImportUsers $users, array $options, ProjectId $projectId): ResponseInterface
+    public function importUsers(Request\ImportUsers $users, ProjectId $projectId, array $options = []): ResponseInterface
     {
         return $this->requestApi(
             \sprintf(
@@ -222,12 +221,12 @@ class ApiClient implements ClientInterface
 
     /**
      * @param array<string> $uids
-     * @param array<string, string|bool> $options
+     * @param array<string, mixed> $options
      *
      * @throws AuthException
      * @throws FirebaseException
      */
-    public function deleteUsers(array $uids, array $options, ProjectId $projectId): ResponseInterface
+    public function deleteUsers(array $uids, ProjectId $projectId, array $options = []): ResponseInterface
     {
         return $this->requestApi(
             \sprintf(

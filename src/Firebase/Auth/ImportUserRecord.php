@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kreait\Firebase\Auth;
 
 use DateTimeImmutable;
+use GuzzleHttp\Psr7\Uri;
 use Kreait\Firebase\Exception\InvalidArgumentException;
 use Kreait\Firebase\Util\JSON;
 use Kreait\Firebase\Value\Email;
@@ -70,7 +71,7 @@ class ImportUserRecord implements \JsonSerializable
     /**
      * @return static
      */
-    public function withEmail(Email $email): self
+    public function withEmail(string $email): self
     {
         $request = clone $this;
         $request->email = $email;
@@ -78,19 +79,19 @@ class ImportUserRecord implements \JsonSerializable
         return $request;
     }
 
-    public function withVerifiedEmail(Email $email): self
+    public function withVerifiedEmail(string $email): self
     {
         $request = clone $this;
-        $request->email = $email->__toString();
+        $request->email = $email;
         $request->emailVerified = true;
 
         return $request;
     }
 
-    public function withUnverifiedEmail(Email $email): self
+    public function withUnverifiedEmail(string $email): self
     {
         $request = clone $this;
-        $request->email = $email->__toString();
+        $request->email = $email;
         $request->emailVerified = false;
 
         return $request;
@@ -104,18 +105,18 @@ class ImportUserRecord implements \JsonSerializable
         return $request;
     }
 
-    public function withPhotoUrl(Url $url): self
+    public function withPhotoUrl(string $url): self
     {
         $request = clone $this;
-        $request->photoUrl = $url->__toString();
+        $request->photoUrl = new Url(new Uri($url));
 
         return $request;
     }
 
-    public function withPhoneNumber(PhoneNumber $phoneNumber): self
+    public function withPhoneNumber(string $phoneNumber): self
     {
         $request = clone $this;
-        $request->phoneNumber = $phoneNumber->__toString();
+        $request->phoneNumber = new PhoneNumber($phoneNumber);
 
         return $request;
     }
