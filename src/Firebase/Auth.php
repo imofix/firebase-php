@@ -74,7 +74,7 @@ class Auth
     private $projectId;
 
     /**
-     * @param iterable<ApiClient|TokenGenerator|Verifier|SignInHandler>|ApiClient|TokenGenerator|Verifier|SignInHandler|ProjectId|TenantId|null ...$x
+     * @param iterable<ApiClient|TokenGenerator|Verifier|SignInHandler>|ApiClient|TokenGenerator|Verifier|SignInHandler|TenantId|ProjectId|null ...$x
      *
      * @internal
      */
@@ -118,8 +118,8 @@ class Auth
     /**
      * @param array<Uid|string> $uids
      *
-     * @throws Exception\FirebaseException
      * @throws Exception\AuthException
+     * @throws Exception\FirebaseException
      *
      * @return array<string, UserRecord|null>
      */
@@ -146,8 +146,8 @@ class Auth
     }
 
     /**
-     * @throws Exception\FirebaseException
      * @throws Exception\AuthException
+     * @throws Exception\FirebaseException
      *
      * @return Traversable<UserRecord>|UserRecord[]
      */
@@ -484,15 +484,15 @@ class Auth
     }
 
     /**
+     * @deprecated 5.4.0 use {@see setCustomUserClaims}($id, array $claims) instead
+     * @see setCustomUserClaims
+     * @codeCoverageIgnore
+     *
      * @param Uid|string $uid
      * @param array<string, mixed> $attributes
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
-     *
-     * @deprecated 5.4.0 use {@see setCustomUserClaims}($id, array $claims) instead
-     * @see setCustomUserClaims
-     * @codeCoverageIgnore
      */
     public function setCustomUserAttributes($uid, array $attributes): UserRecord
     {
@@ -504,13 +504,13 @@ class Auth
     }
 
     /**
+     * @deprecated 5.4.0 use {@see setCustomUserClaims}($uid) instead
+     * @see removeCustomUserClaims
+     *
      * @param Uid|string $uid
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
-     *
-     * @see removeCustomUserClaims
-     * @deprecated 5.4.0 use {@see setCustomUserClaims}($uid) instead
      */
     public function deleteCustomUserAttributes($uid): UserRecord
     {
@@ -602,8 +602,7 @@ class Auth
             try {
                 $user = $this->getUser($verifiedToken->claims()->get('sub'));
             } catch (Throwable $e) {
-                throw new InvalidToken($verifiedToken, "Error while getting the token's user: {$e->getMessage()}",
-                    $e->getCode(), $e);
+                throw new InvalidToken($verifiedToken, "Error while getting the token's user: {$e->getMessage()}", $e->getCode(), $e);
             }
 
             // The timestamp, in seconds, which marks a boundary, before which Firebase ID token are considered revoked.
@@ -699,11 +698,8 @@ class Auth
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
      */
-    public function confirmPasswordResetAndReturnEmail(
-        string $oobCode,
-        $newPassword,
-        bool $invalidatePreviousSessions = true
-    ): Email {
+    public function confirmPasswordResetAndReturnEmail(string $oobCode, $newPassword, bool $invalidatePreviousSessions = true): Email
+    {
         $newPassword = $newPassword instanceof ClearTextPassword ? $newPassword : new ClearTextPassword($newPassword);
 
         $response = $this->client->confirmPasswordReset($oobCode, (string) $newPassword);
@@ -871,11 +867,8 @@ class Auth
         throw new FailedToSignIn('Failed to sign in anonymously: No ID token or UID available');
     }
 
-    public function signInWithTwitterOauthCredential(
-        string $accessToken,
-        string $oauthTokenSecret,
-        ?string $redirectUrl = null
-    ): SignInResult {
+    public function signInWithTwitterOauthCredential(string $accessToken, string $oauthTokenSecret, ?string $redirectUrl = null): SignInResult
+    {
         return $this->signInWithIdpAccessToken(Provider::TWITTER, $accessToken, $redirectUrl, $oauthTokenSecret);
     }
 
@@ -897,12 +890,8 @@ class Auth
      *
      * @throws FailedToSignIn
      */
-    public function signInWithIdpAccessToken(
-        $provider,
-        string $accessToken,
-        $redirectUrl = null,
-        ?string $oauthTokenSecret = null
-    ): SignInResult {
+    public function signInWithIdpAccessToken($provider, string $accessToken, $redirectUrl = null, ?string $oauthTokenSecret = null): SignInResult
+    {
         $provider = $provider instanceof Provider ? (string) $provider : $provider;
         $redirectUrl = $redirectUrl ?? 'http://localhost';
 
@@ -911,8 +900,7 @@ class Auth
         }
 
         if ($oauthTokenSecret) {
-            $action = SignInWithIdpCredentials::withAccessTokenAndOauthTokenSecret($provider, $accessToken,
-                $oauthTokenSecret);
+            $action = SignInWithIdpCredentials::withAccessTokenAndOauthTokenSecret($provider, $accessToken, $oauthTokenSecret);
         } else {
             $action = SignInWithIdpCredentials::withAccessToken($provider, $accessToken);
         }
