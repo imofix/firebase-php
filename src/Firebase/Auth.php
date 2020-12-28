@@ -953,26 +953,26 @@ class Auth
     /**
      * @see https://cloud.google.com/identity-platform/docs/reference/rest/v1/projects.accounts/batchCreate
      *
-     * @param array<string, string|int> $options
+     * @param array<string, mixed> $options
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
      */
-    public function importUsers(Request\ImportUsers $users, array $options): void
+    public function importUsers(Request\ImportUsers $users, array $options = []): void
     {
-        $this->client->importUsers($users, $options, $this->projectId);
+        $this->client->importUsers($users, $this->projectId, $options);
     }
 
     /**
      * @see https://cloud.google.com/identity-platform/docs/reference/rest/v1/projects.accounts/batchDelete
      *
      * @param array<Uid|string> $uids
-     * @param array<string, string|int> $options
+     * @param array<string, mixed> $options
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
      */
-    public function deleteUsers(array $uids, array $options): void
+    public function deleteUsers(array $uids, array $options = []): void
     {
         $uids = \array_map(
             static function ($uid): string {
@@ -981,7 +981,7 @@ class Auth
             $uids
         );
 
-        $this->client->deleteUsers($uids, $options, $this->projectId);
+        $this->client->deleteUsers($uids, $this->projectId, $options);
     }
 
     /**
