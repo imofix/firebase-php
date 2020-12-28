@@ -16,9 +16,12 @@ use Kreait\Firebase\Exception\Auth\OperationNotAllowed;
 use Kreait\Firebase\Exception\Auth\UserDisabled;
 use Kreait\Firebase\Exception\AuthApiExceptionConverter;
 use Kreait\Firebase\Exception\AuthException;
+use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Request\CreateUser;
 use Kreait\Firebase\Request\UpdateUser;
 use Psr\Clock\ClockInterface;
+use Kreait\Firebase\Project\ProjectId;
+use Kreait\Firebase\Value\Provider;
 use Psr\Http\Message\ResponseInterface;
 use Stringable;
 use Throwable;
@@ -158,6 +161,27 @@ class ApiClient
         $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:batchDelete');
 
         return $this->requestApi($url, $data);
+    }
+
+     /**
+     * @param array<ImportUserRecord> $users
+     * @param array<string, mixed> $options
+     *
+     * @throws AuthException
+     * @throws FirebaseException
+     */
+    public function importUsers(array $users, ProjectId $projectId, array $options = []): ResponseInterface
+    {
+        return $this->requestApi(
+            \sprintf(
+                'https://identitytoolkit.googleapis.com/v1/projects/%s/accounts:batchCreate',
+                $projectId->value()
+            ),
+            \array_merge(
+                ['users' => $users],
+                $options
+            )
+        );
     }
 
     /**

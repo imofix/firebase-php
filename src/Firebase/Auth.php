@@ -13,6 +13,11 @@ use Kreait\Firebase\Auth\ApiClient;
 use Kreait\Firebase\Auth\CustomTokenViaGoogleCredentials;
 use Kreait\Firebase\Auth\DeleteUsersRequest;
 use Kreait\Firebase\Auth\DeleteUsersResult;
+use Kreait\Firebase\Auth\IdTokenVerifier;
+use Kreait\Firebase\Auth\DeleteUserError;
+use Kreait\Firebase\Auth\ImportUserError;
+use Kreait\Firebase\Auth\ImportUserRecord;
+use Kreait\Firebase\Auth\ImportUsersResult;
 use Kreait\Firebase\Auth\SendActionLink\FailedToSendActionLink;
 use Kreait\Firebase\Auth\SignIn\FailedToSignIn;
 use Kreait\Firebase\Auth\SignInAnonymously;
@@ -31,11 +36,12 @@ use Kreait\Firebase\Exception\Auth\RevokedIdToken;
 use Kreait\Firebase\Exception\Auth\RevokedSessionCookie;
 use Kreait\Firebase\Exception\Auth\UserNotFound;
 use Kreait\Firebase\Exception\InvalidArgumentException;
-use Kreait\Firebase\JWT\IdTokenVerifier;
 use Kreait\Firebase\JWT\SessionCookieVerifier;
 use Kreait\Firebase\JWT\Token\Parser;
 use Kreait\Firebase\Request\CreateUser;
 use Kreait\Firebase\Request\UpdateUser;
+use Kreait\Firebase\Exception\RuntimeException;
+use Kreait\Firebase\Project\ProjectId;
 use Kreait\Firebase\Util\DT;
 use Kreait\Firebase\Value\ClearTextPassword;
 use Kreait\Firebase\Value\Email;
@@ -69,6 +75,7 @@ final class Auth implements Contract\Auth
         private readonly IdTokenVerifier $idTokenVerifier,
         private readonly SessionCookieVerifier $sessionCookieVerifier,
         private readonly ClockInterface $clock,
+        private readonly ProjectId $projectId,
     ) {
         $this->jwtParser = new Parser(new JoseEncoder());
     }
@@ -244,6 +251,61 @@ final class Auth implements Contract\Auth
         } catch (UserNotFound) {
             throw new UserNotFound("No user with uid '{$uid}' found.");
         }
+    }
+
+    public function deleteUsers(array $uids, array $options = []): DeleteUsersResult
+    {
+        if ($this->projectId === null) {
+            throw new RuntimeException('Batch delete operation requires known projectId.');
+        }
+
+        $uids = \array_map(
+            static function (string $uid): string {
+                return (new Uid($uid))->__toString();
+            },
+            $uids
+        );
+
+        $response = $this->client->deleteUsers($uids, $this->projectId, $options);
+        $body = JSON::decode((string) $response->getBody(), true);
+
+        $errors = \array_map(
+            static function (array $error): DeleteUserError {
+                return DeleteUserError::fromResponseData($error);
+            },
+            $body['errors'] ?? []
+        );
+
+        return new DeleteUsersResult(\count($uids), $errors);
+    }
+
+    public function importUsers(array $users, array $options = []): ImportUsersResult
+    {
+        if ($this->projectId === null) {
+            throw new RuntimeException('Batch import operation requires known projectId.');
+        }
+
+        if (\count($users) === 0) {
+            throw new InvalidArgumentException('Users must not be empty.');
+        }
+
+        if (\count($users) > 1000) {
+            throw new InvalidArgumentException(
+                \sprintf('Users list must not contain more than %d records', 1000)
+            );
+        }
+
+        $response = $this->client->importUsers($users, $this->projectId, $options);
+        $body = JSON::decode((string) $response->getBody(), true);
+
+        $errors = \array_map(
+            static function (array $error): ImportUserError {
+                return ImportUserError::fromResponseData($error);
+            },
+            $body['error'] ?? []
+        );
+
+        return new ImportUsersResult(\count($users), $errors);
     }
 
     public function deleteUsers(iterable $uids, bool $forceDeleteEnabledUsers = false): DeleteUsersResult
