@@ -68,6 +68,7 @@ class ImportUsersTest extends IntegrationTestCase
                     ->withDisplayName($newDisplayName = 'Some display name')
                     ->withPhotoUrl($newPhotoUrl = 'https://example.org/photo.jpg')
                     ->withVerifiedEmail($email)
+                    ->markAsDisabled()
             ]
         );
 
@@ -78,10 +79,10 @@ class ImportUsersTest extends IntegrationTestCase
         $this->assertSame($newPhotoUrl, $user->photoUrl);
         $this->assertSame($email, $user->email);
         $this->assertTrue($user->emailVerified);
+        $this->assertTrue($user->disabled);
 
         // Values that are not provided with import request fallback to default state
         $this->assertNull($user->phoneNumber);
-        $this->assertFalse($user->disabled);
 
         $this->auth->deleteUser($user->uid);
     }
