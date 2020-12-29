@@ -16,8 +16,12 @@ use Kreait\Firebase\Auth\ActionCodeSettings\ValidatedActionCodeSettings;
 use Kreait\Firebase\Auth\ApiClient;
 use Kreait\Firebase\Auth\CreateActionLink;
 use Kreait\Firebase\Auth\CreateActionLink\FailedToCreateActionLink;
+use Kreait\Firebase\Auth\DeleteUserError;
+use Kreait\Firebase\Auth\DeleteUsersResult;
 use Kreait\Firebase\Auth\IdTokenVerifier;
+use Kreait\Firebase\Auth\ImportUserError;
 use Kreait\Firebase\Auth\ImportUserRecord;
+use Kreait\Firebase\Auth\ImportUsersResult;
 use Kreait\Firebase\Auth\SendActionLink;
 use Kreait\Firebase\Auth\SendActionLink\FailedToSendActionLink;
 use Kreait\Firebase\Auth\SignIn\FailedToSignIn;
@@ -355,7 +359,7 @@ class Auth
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
      */
-    public function deleteUsers(array $uids, array $options = []): void
+    public function deleteUsers(array $uids, array $options = []): DeleteUsersResult
     {
         if ($this->projectId === null) {
             throw new RuntimeException('Batch delete operation requires known projectId.');
@@ -368,7 +372,17 @@ class Auth
             $uids
         );
 
-        $this->client->deleteUsers($uids, $this->projectId, $options);
+        $response = $this->client->deleteUsers($uids, $this->projectId, $options);
+        $body = JSON::decode((string) $response->getBody(), true);
+
+        $errors = \array_map(
+            static function (array $error): DeleteUserError {
+                return DeleteUserError::fromResponseData($error);
+            },
+            $body['errors'] ?? []
+        );
+
+        return new DeleteUsersResult(\count($uids), $errors);
     }
 
     /**
@@ -380,7 +394,7 @@ class Auth
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
      */
-    public function importUsers(array $users, array $options = []): void
+    public function importUsers(array $users, array $options = []): ImportUsersResult
     {
         if ($this->projectId === null) {
             throw new RuntimeException('Batch import operation requires known projectId.');
@@ -396,7 +410,17 @@ class Auth
             );
         }
 
-        $this->client->importUsers($users, $this->projectId, $options);
+        $response = $this->client->importUsers($users, $this->projectId, $options);
+        $body = JSON::decode((string) $response->getBody(), true);
+
+        $errors = \array_map(
+            static function (array $error): ImportUserError {
+                return ImportUserError::fromResponseData($error);
+            },
+            $body['errors'] ?? []
+        );
+
+        return new ImportUsersResult(\count($users), $errors);
     }
 
     /**
