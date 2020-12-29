@@ -201,7 +201,7 @@ class ImportUserRecord implements \JsonSerializable
             'email' => $this->email,
             'emailVerified' => $this->emailVerified,
             'displayName' => $this->displayName,
-            'disableUser' => $disableUser,
+            'disabled' => $disableUser,
             'phoneNumber' => $this->phoneNumber,
             'photoUrl' => $this->photoUrl,
             'customAttributes' => $customClaims,
