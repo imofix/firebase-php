@@ -200,19 +200,23 @@ class ApiClient implements ClientInterface
     }
 
     /**
+     * @param array<ImportUserRecord> $users
      * @param array<string, mixed> $options
      *
      * @throws AuthException
      * @throws FirebaseException
      */
-    public function importUsers(Request\ImportUsers $users, ProjectId $projectId, array $options = []): ResponseInterface
+    public function importUsers(array $users, ProjectId $projectId, array $options = []): ResponseInterface
     {
         return $this->requestApi(
             \sprintf(
                 'https://identitytoolkit.googleapis.com/v1/projects/%s/accounts:batchCreate',
                 $projectId->value()
             ),
-            \array_merge($users->jsonSerialize(), $options),
+            \array_merge(
+                ['users' => $users],
+                $options
+            ),
             [
                 'access_token_auth' => true,
             ]

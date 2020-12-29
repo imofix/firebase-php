@@ -17,6 +17,7 @@ use Kreait\Firebase\Auth\ApiClient;
 use Kreait\Firebase\Auth\CreateActionLink;
 use Kreait\Firebase\Auth\CreateActionLink\FailedToCreateActionLink;
 use Kreait\Firebase\Auth\IdTokenVerifier;
+use Kreait\Firebase\Auth\ImportUserRecord;
 use Kreait\Firebase\Auth\SendActionLink;
 use Kreait\Firebase\Auth\SendActionLink\FailedToSendActionLink;
 use Kreait\Firebase\Auth\SignIn\FailedToSignIn;
@@ -37,6 +38,7 @@ use Kreait\Firebase\Exception\Auth\RevokedIdToken;
 use Kreait\Firebase\Exception\Auth\UserDisabled;
 use Kreait\Firebase\Exception\Auth\UserNotFound;
 use Kreait\Firebase\Exception\InvalidArgumentException;
+use Kreait\Firebase\Exception\RuntimeException;
 use Kreait\Firebase\Project\ProjectId;
 use Kreait\Firebase\Util\Deprecation;
 use Kreait\Firebase\Util\DT;
@@ -355,6 +357,10 @@ class Auth
      */
     public function deleteUsers(array $uids, array $options = []): void
     {
+        if ($this->projectId === null) {
+            throw new RuntimeException('Batch delete operation requires known projectId.');
+        }
+
         $uids = \array_map(
             static function (string $uid): string {
                 return (new Uid($uid))->__toString();
@@ -368,13 +374,28 @@ class Auth
     /**
      * @see https://cloud.google.com/identity-platform/docs/reference/rest/v1/projects.accounts/batchCreate
      *
+     * @param array<ImportUserRecord> $users
      * @param array<string, mixed> $options
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
      */
-    public function importUsers(Request\ImportUsers $users, array $options = []): void
+    public function importUsers(array $users, array $options = []): void
     {
+        if ($this->projectId === null) {
+            throw new RuntimeException('Batch import operation requires known projectId.');
+        }
+
+        if (\count($users) === 0) {
+            throw new InvalidArgumentException('Users must not be empty.');
+        }
+
+        if (\count($users) > 1000) {
+            throw new InvalidArgumentException(
+                \sprintf('Users list must not contain more than %d records', 1000)
+            );
+        }
+
         $this->client->importUsers($users, $this->projectId, $options);
     }
 

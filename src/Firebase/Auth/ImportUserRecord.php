@@ -71,7 +71,7 @@ class ImportUserRecord implements \JsonSerializable
     public function withEmail(string $email): self
     {
         $request = clone $this;
-        $request->email = $email;
+        $request->email = new Email($email);
 
         return $request;
     }
@@ -79,7 +79,7 @@ class ImportUserRecord implements \JsonSerializable
     public function withVerifiedEmail(string $email): self
     {
         $request = clone $this;
-        $request->email = $email;
+        $request->email = new Email($email);
         $request->emailVerified = true;
 
         return $request;
@@ -88,7 +88,7 @@ class ImportUserRecord implements \JsonSerializable
     public function withUnverifiedEmail(string $email): self
     {
         $request = clone $this;
-        $request->email = $email;
+        $request->email = new Email($email);
         $request->emailVerified = false;
 
         return $request;
@@ -174,6 +174,9 @@ class ImportUserRecord implements \JsonSerializable
         return $request;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function jsonSerialize(): array
     {
         if ($this->uid === null) {
@@ -201,7 +204,7 @@ class ImportUserRecord implements \JsonSerializable
             'disableUser' => $disableUser,
             'phoneNumber' => $this->phoneNumber,
             'photoUrl' => $this->photoUrl,
-            'customClaims' => $customClaims,
+            'customAttributes' => $customClaims,
             'validSince' => $tokensValidAfterTime,
         ];
 
