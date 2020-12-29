@@ -216,10 +216,7 @@ class ApiClient implements ClientInterface
             \array_merge(
                 ['users' => $users],
                 $options
-            ),
-            [
-                'access_token_auth' => true,
-            ]
+            )
         );
     }
 
@@ -243,21 +240,17 @@ class ApiClient implements ClientInterface
                     'force' => $options['force'] ?? null,
                     'tenantId' => $options['tenantId'] ?? null,
                 ]
-            ),
-            [
-                'access_token_auth' => true,
-            ]
+            )
         );
     }
 
     /**
      * @param array<mixed> $data
-     * @param array<mixed> $headers
      *
      * @throws AuthException
      * @throws FirebaseException
      */
-    private function requestApi(string $uri, array $data, ?array $headers = null): ResponseInterface
+    private function requestApi(string $uri, array $data): ResponseInterface
     {
         $options = [];
 
@@ -267,10 +260,6 @@ class ApiClient implements ClientInterface
 
         if (!empty($data)) {
             $options['json'] = $data;
-        }
-
-        if ($headers !== null) {
-            $options[RequestOptions::HEADERS] = $headers;
         }
 
         try {
