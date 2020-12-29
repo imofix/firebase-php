@@ -22,9 +22,9 @@ class ImportUsersTest extends IntegrationTestCase
         $this->auth = self::$factory->createAuth();
     }
 
-    public function testImportUser(): void
+    public function testImportUsers(): void
     {
-        $this->auth->importUsers(
+        $importResult = $this->auth->importUsers(
             [
                 ImportUserRecord::new()
                     ->withUid($uid = \bin2hex(\random_bytes(5)))
@@ -35,6 +35,8 @@ class ImportUsersTest extends IntegrationTestCase
                     ->withCustomClaims($claims = ['admin' => true]),
             ]
         );
+
+        $this->assertEquals(1, $importResult->getSuccessCount());
 
         $user = $this->auth->getUser($uid);
 
@@ -50,27 +52,29 @@ class ImportUsersTest extends IntegrationTestCase
         $this->auth->deleteUser($user->uid);
     }
 
-    public function testImportUserReplacesExistingUser(): void
+    public function testImportedUserReplacesExistingUser(): void
     {
         $this->auth->createUser(
             CreateUser::new()
                 ->withUid($uid = \bin2hex(\random_bytes(5)))
                 ->withVerifiedEmail($email = $uid.'@example.org')
-                ->withPhoneNumber( '+1234567'.\random_int(1000, 9999))
+                ->withPhoneNumber('+1234567'.\random_int(1000, 9999))
                 ->withPhotoUrl('https://example.org/old-photo.jpg')
                 ->withDisplayName('Old display name')
         );
 
-        $this->auth->importUsers(
+        $importResult = $this->auth->importUsers(
             [
                 ImportUserRecord::new()
                     ->withUid($uid)
                     ->withDisplayName($newDisplayName = 'Some display name')
                     ->withPhotoUrl($newPhotoUrl = 'https://example.org/photo.jpg')
                     ->withVerifiedEmail($email)
-                    ->markAsDisabled()
+                    ->markAsDisabled(),
             ]
         );
+
+        $this->assertEquals(1, $importResult->getSuccessCount());
 
         $user = $this->auth->getUser($uid);
 

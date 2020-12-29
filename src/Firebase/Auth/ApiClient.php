@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kreait\Firebase\Auth;
 
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\RequestOptions;
 use Kreait\Firebase\Exception\Auth\EmailNotFound;
 use Kreait\Firebase\Exception\Auth\ExpiredOobCode;
 use Kreait\Firebase\Exception\Auth\InvalidOobCode;
@@ -231,7 +230,7 @@ class ApiClient implements ClientInterface
     {
         return $this->requestApi(
             \sprintf(
-                'POST https://identitytoolkit.googleapis.com/v1/projects/%s/accounts:batchDelete',
+                'https://identitytoolkit.googleapis.com/v1/projects/%s/accounts:batchDelete',
                 $projectId->value()
             ),
             \array_filter(
