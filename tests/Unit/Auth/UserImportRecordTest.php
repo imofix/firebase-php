@@ -28,7 +28,7 @@ class UserImportRecordTest extends TestCase
                 ->withPhotoUrl($photoUrl = 'https://example.org/photo.jpg')
                 ->withPhoneNumber($phoneNumber = '+1234567' . \random_int(1000, 9999))
                 ->withVerifiedEmail($email = $uid . '@example.org')
-                ->markTokensValidAfter($validSince = new \DateTimeImmutable('30.12.2020'))
+                ->markTokensValidAfter($validSince = new \DateTimeImmutable())
                 ->markAsEnabled()
                 ->withCustomClaims($claims = ['admin' => true]),
             JSON::encode([
