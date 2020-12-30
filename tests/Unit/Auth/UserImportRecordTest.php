@@ -9,6 +9,9 @@ use Kreait\Firebase\Auth\ImportUserRecord;
 use Kreait\Firebase\Util\JSON;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ */
 class UserImportRecordTest extends TestCase
 {
     /**
