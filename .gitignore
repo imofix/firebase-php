@@ -1,9 +1,11 @@
+/.xdebug
 /build
 /vendor
 /docs/_build
 /docs/*.pyc
 /tests/_fixtures/test_*
 
+/.env
 /.php_cs
 /.php_cs.cache
 /.phpunit.result.cache
