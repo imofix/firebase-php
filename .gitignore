@@ -1,11 +1,14 @@
 *.log
 
+/.xdebug
+/.composer
 /.build
 /vendor
 /docs/_build
 /docs/*.pyc
 /tests/.env
 
+/.env
 /.firebaserc
 /.php-cs-fixer.cache
 /.phpunit.result.cache
