@@ -17,7 +17,6 @@ use Google\Auth\HttpHandler\HttpHandlerFactory;
 use Google\Auth\Middleware\AuthTokenMiddleware;
 use Google\Auth\ProjectIdProviderInterface;
 use Google\Auth\SignBlobInterface;
-use Google\Cloud\Firestore\FirestoreClient;
 use Google\Cloud\Storage\StorageClient;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -461,13 +460,14 @@ final class Factory
     {
         $config = $this->googleCloudClientConfig() + $this->firestoreClientConfig;
 
-        try {
-            $firestoreClient = new FirestoreClient($config);
-        } catch (Throwable $e) {
-            throw new RuntimeException('Unable to create a FirestoreClient: '.$e->getMessage(), $e->getCode(), $e);
-        }
+        $apiClient = new Firestore\ApiClient(
+            $this->createApiClient([
+                ...$config,
+                'base_uri' => 'https://firestore.googleapis.com/v1/projects/'.$projectId->value().'/databases/(default)/',
+            ])
+        );
 
-        return Firestore::withFirestoreClient($firestoreClient);
+        return Firestore::withApiClient($apiClient);
     }
 
     public function createStorage(): Contract\Storage
