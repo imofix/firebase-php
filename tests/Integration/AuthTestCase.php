@@ -559,7 +559,7 @@ abstract class AuthTestCase extends IntegrationTestCase
             ],
         );
 
-        $this->assertSame(1, $importResult->getSuccessCount());
+        $this->assertSame(1, $importResult->users);
 
         $user = $this->auth->getUser($uid);
 
@@ -598,7 +598,7 @@ abstract class AuthTestCase extends IntegrationTestCase
             ],
         );
 
-        $this->assertSame(1, $importResult->getSuccessCount());
+        $this->assertSame(1, $importResult->users);
 
         $user = $this->auth->getUser($uid);
 

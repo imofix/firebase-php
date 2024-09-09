@@ -17,14 +17,4 @@ final class ImportUserError
     {
         return new self($error['index'], $error['message']);
     }
-
-    public function getIndex(): int
-    {
-        return $this->index;
-    }
-
-    public function getMessage(): string
-    {
-        return $this->message;
-    }
 }
