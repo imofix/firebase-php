@@ -11,7 +11,7 @@ class ImportUsersResult
      */
     public function __construct(
         public readonly int $users,
-        public readonly array $errors = []
+        public readonly array $errors = [],
     ) {
     }
 }
