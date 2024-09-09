@@ -458,13 +458,8 @@ final class Factory
 
     public function createFirestore(): Contract\Firestore
     {
-        $config = $this->googleCloudClientConfig() + $this->firestoreClientConfig;
-
-        $apiClient = new Firestore\ApiClient(
-            $this->createApiClient([
-                ...$config,'base_uri' => 'https://firestore.googleapis.com/v1/projects/' . $projectId . '/databases/(default)/',
-            ])
-        );
+        $baseUri = 'https://firestore.googleapis.com/v1/projects/'.$this->getProjectId().'/databases/(default)/';
+        $apiClient = new Firestore\ApiClient($this->createApiClient(['base_uri' => $baseUri]));
 
         return Firestore::withApiClient($apiClient);
     }

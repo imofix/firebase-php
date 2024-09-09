@@ -16,26 +16,23 @@ use Throwable;
  */
 class ApiClient
 {
-    private ClientInterface $client;
-    private FirestoreApiExceptionConverter $errorHandler;
+    private readonly FirestoreApiExceptionConverter $errorHandler;
 
     /**
      * @internal
      */
-    public function __construct(ClientInterface $client)
+    public function __construct(private readonly ClientInterface $client)
     {
-        $this->client = $client;
         $this->errorHandler = new FirestoreApiExceptionConverter();
     }
 
     /**
      * @param array<string, mixed> $options
      *
-     * @return mixed
      * @throws FirebaseException
      * @throws FirestoreException
      */
-    public function get(string $path, array $options = [])
+    public function get(string $path, array $options = []): mixed
     {
         return $this->requestApi('GET', $path, $options);
     }
@@ -44,11 +41,10 @@ class ApiClient
      * @param array<string, mixed> $data
      * @param array<string, mixed> $options
      *
-     * @return mixed
      * @throws FirebaseException
      * @throws FirestoreException
      */
-    public function patch(string $path, array $data, array $options = [])
+    public function patch(string $path, array $data, array $options = []): mixed
     {
         $options['json'] = $data;
 
@@ -60,9 +56,8 @@ class ApiClient
      *
      * @throws FirestoreException
      * @throws FirebaseException
-     * @return mixed
      */
-    private function requestApi(string $method, string $uri, array $options = [])
+    private function requestApi(string $method, string $uri, array $options = []): mixed
     {
         try {
             $response = $this->client->request($method, $uri, $options);

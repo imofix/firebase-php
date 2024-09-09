@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Kreait\Firebase\Auth;
 
+use Beste\Json;
 use DateTimeImmutable;
 use GuzzleHttp\Psr7\Uri;
+use JsonSerializable;
 use Kreait\Firebase\Exception\InvalidArgumentException;
-use Kreait\Firebase\Util\JSON;
 use Kreait\Firebase\Value\Email;
-use Kreait\Firebase\Value\PhoneNumber;
 use Kreait\Firebase\Value\Uid;
 use Kreait\Firebase\Value\Url;
 
-class ImportUserRecord implements \JsonSerializable
+use function array_filter;
+use function count;
+
+class ImportUserRecord implements JsonSerializable
 {
     private ?Uid $uid = null;
     private ?Email $email = null;
@@ -27,7 +30,6 @@ class ImportUserRecord implements \JsonSerializable
 
     private ?DateTimeImmutable $tokensValidAfterTime = null;
 
-    /** @var bool|null */
     private ?bool $markAsEnabled = null;
     private ?bool $markAsDisabled = null;
 
@@ -46,7 +48,7 @@ class ImportUserRecord implements \JsonSerializable
     public function withUid(string $uid): self
     {
         $request = clone $this;
-        $request->uid = new Uid($uid);
+        $request->uid = Uid::fromString($uid);
 
         return $request;
     }
@@ -57,7 +59,7 @@ class ImportUserRecord implements \JsonSerializable
     public function withEmail(string $email): self
     {
         $request = clone $this;
-        $request->email = new Email($email);
+        $request->email = Email::fromString($email);
 
         return $request;
     }
@@ -65,7 +67,7 @@ class ImportUserRecord implements \JsonSerializable
     public function withVerifiedEmail(string $email): self
     {
         $request = clone $this;
-        $request->email = new Email($email);
+        $request->email = Email::fromString($email);
         $request->emailVerified = true;
 
         return $request;
@@ -74,7 +76,7 @@ class ImportUserRecord implements \JsonSerializable
     public function withUnverifiedEmail(string $email): self
     {
         $request = clone $this;
-        $request->email = new Email($email);
+        $request->email = Email::fromString($email);
         $request->emailVerified = false;
 
         return $request;
@@ -91,7 +93,7 @@ class ImportUserRecord implements \JsonSerializable
     public function withPhotoUrl(string $url): self
     {
         $request = clone $this;
-        $request->photoUrl = new Url(new Uri($url));
+        $request->photoUrl = Url::fromString(new Uri($url));
 
         return $request;
     }
@@ -148,7 +150,7 @@ class ImportUserRecord implements \JsonSerializable
     }
 
     /**
-     * @param array<UserInfo> $providers
+     * @param list<UserInfo> $providers
      *
      * @return $this
      */
@@ -177,34 +179,35 @@ class ImportUserRecord implements \JsonSerializable
             $disableUser = false;
         }
 
-        $customClaims = \count($this->customClaims) > 0 ? Json::encode($this->customClaims) : null;
-        $tokensValidAfterTime = $this->tokensValidAfterTime !== null
-            ? $this->tokensValidAfterTime->format(\DATE_ATOM)
-            : null;
+        $customClaims = count($this->customClaims) > 0 ? JSON::encode($this->customClaims) : null;
+        $tokensValidAfterTime = $this->tokensValidAfterTime?->format(\DATE_ATOM);
 
         $record = [
-            'localId' => $this->uid,
-            'email' => $this->email,
+            'localId' => $this->uid->value,
+            'email' => $this->email->value,
             'emailVerified' => $this->emailVerified,
             'displayName' => $this->displayName,
             'disabled' => $disableUser,
             'phoneNumber' => $this->phoneNumber,
-            'photoUrl' => $this->photoUrl,
+            'photoUrl' => $this->photoUrl->value,
             'customAttributes' => $customClaims,
             'validSince' => $tokensValidAfterTime,
         ];
 
-        if (\count($this->providers) > 0) {
-            foreach ($this->providers as $providerData) {
-                $record['providerUserInfo'][] = $providerData->jsonSerialize();
-            }
+        foreach ($this->providers as $providerData) {
+            $record['providerUserInfo'][] = [
+                'rawId' => $providerData->uid,
+                'providerId' => $providerData->providerId,
+                'displayName' => $providerData->displayName,
+                'email' => $providerData->email,
+                'phoneNumber' => $providerData->phoneNumber,
+                'photoUrl' => $providerData->photoUrl,
+            ];
         }
 
-        return \array_filter(
+        return array_filter(
             $record,
-            static function ($value) {
-                return $value !== null;
-            }
+            static fn($value): bool => $value !== null,
         );
     }
 }

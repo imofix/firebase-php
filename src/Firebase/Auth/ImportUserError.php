@@ -6,16 +6,8 @@ namespace Kreait\Firebase\Auth;
 
 final class ImportUserError
 {
-    /** @var int */
-    private $index;
-
-    /** @var string */
-    private $message;
-
-    private function __construct(int $index, string $message)
+    private function __construct(public readonly int $index, public readonly string $message)
     {
-        $this->index = $index;
-        $this->message = $message;
     }
 
     /**

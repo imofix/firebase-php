@@ -16,8 +16,7 @@ use Throwable;
  */
 class FirestoreApiExceptionConverter
 {
-    /** @var ErrorResponseParser */
-    private $responseParser;
+    private readonly ErrorResponseParser $responseParser;
 
     /**
      * @internal
@@ -52,9 +51,9 @@ class FirestoreApiExceptionConverter
 
         // TODO: Handle the different errors.
 
-//        if (\mb_stripos($message, 'credentials_mismatch') !== false) {
-//            return new CredentialsMismatch('Invalid custom token: The custom token corresponds to a different Firebase project.', $code, $e);
-//        }
+        //        if (\mb_stripos($message, 'credentials_mismatch') !== false) {
+        //            return new CredentialsMismatch('Invalid custom token: The custom token corresponds to a different Firebase project.', $code, $e);
+        //        }
 
         return new FirestoreError($message, $code, $e);
     }
