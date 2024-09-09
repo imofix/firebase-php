@@ -550,10 +550,10 @@ abstract class AuthTestCase extends IntegrationTestCase
         $importResult = $this->auth->importUsers(
             [
                 ImportUserRecord::new()
-                    ->withUid($uid = \bin2hex(\random_bytes(5)))
+                    ->withUid($uid = bin2hex(random_bytes(5)))
                     ->withDisplayName($displayName = 'Some display name')
                     ->withPhotoUrl($photoUrl = 'https://example.org/photo.jpg')
-                    ->withPhoneNumber($phoneNumber = '+1234567'.\random_int(1000, 9999))
+                    ->withPhoneNumber($phoneNumber = '+1234567'. random_int(1000, 9999))
                     ->withVerifiedEmail($email = $uid.'@example.org')
                     ->withCustomClaims($claims = ['admin' => true]),
             ],
@@ -575,13 +575,14 @@ abstract class AuthTestCase extends IntegrationTestCase
         $this->auth->deleteUser($user->uid);
     }
 
-    public function testBachImportedUserReplacesExistingUsers(): void
+    #[Test]
+    public function bachImportedUserReplacesExistingUsers(): void
     {
         $this->auth->createUser(
             CreateUser::new()
-                ->withUid($uid = \bin2hex(\random_bytes(5)))
+                ->withUid($uid = bin2hex(random_bytes(5)))
                 ->withVerifiedEmail($email = $uid.'@example.org')
-                ->withPhoneNumber('+1234567'.\random_int(1000, 9999))
+                ->withPhoneNumber('+1234567'. random_int(1000, 9999))
                 ->withPhotoUrl('https://example.org/old-photo.jpg')
                 ->withDisplayName('Old display name'),
         );
