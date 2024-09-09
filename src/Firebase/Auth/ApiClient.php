@@ -169,7 +169,7 @@ class ApiClient
     */
     public function importUsers(array $users, bool $allowOverwrite = false): ResponseInterface
     {
-        $url = $this->awareAuthResourceUrlBuilder->getUrl('accounts:batchCreate');
+        $url = $this->awareAuthResourceUrlBuilder->getUrl('/accounts:batchCreate');
 
         return $this->requestApi(
             $url,
