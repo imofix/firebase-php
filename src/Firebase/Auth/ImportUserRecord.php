@@ -6,6 +6,7 @@ namespace Kreait\Firebase\Auth;
 
 use Beste\Json;
 use DateTimeImmutable;
+use DateTimeInterface;
 use GuzzleHttp\Psr7\Uri;
 use JsonSerializable;
 use Kreait\Firebase\Exception\InvalidArgumentException;
@@ -180,7 +181,7 @@ class ImportUserRecord implements JsonSerializable
         }
 
         $customClaims = count($this->customClaims) > 0 ? JSON::encode($this->customClaims) : null;
-        $tokensValidAfterTime = $this->tokensValidAfterTime?->format(\DATE_ATOM);
+        $tokensValidAfterTime = $this->tokensValidAfterTime?->format(DateTimeInterface::ATOM);
 
         $record = [
             'localId' => $this->uid->value,
@@ -196,12 +197,12 @@ class ImportUserRecord implements JsonSerializable
 
         foreach ($this->providers as $providerData) {
             $record['providerUserInfo'][] = [
-                'rawId' => $providerData->uid,
                 'providerId' => $providerData->providerId,
                 'displayName' => $providerData->displayName,
-                'email' => $providerData->email,
-                'phoneNumber' => $providerData->phoneNumber,
                 'photoUrl' => $providerData->photoUrl,
+                'email' => $providerData->email,
+                'rawId' => $providerData->uid,
+                'phoneNumber' => $providerData->phoneNumber,
             ];
         }
 
