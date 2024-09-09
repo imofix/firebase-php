@@ -34,9 +34,6 @@ class ImportUserRecord implements JsonSerializable
     private ?bool $markAsEnabled = null;
     private ?bool $markAsDisabled = null;
 
-    /** @var list<UserInfo> */
-    private array $providers = [];
-
     private function __construct()
     {
     }
@@ -151,19 +148,6 @@ class ImportUserRecord implements JsonSerializable
     }
 
     /**
-     * @param list<UserInfo> $providers
-     *
-     * @return $this
-     */
-    public function withProviders(array $providers): self
-    {
-        $request = clone $this;
-        $request->providers = $providers;
-
-        return $request;
-    }
-
-    /**
      * @return array<string, mixed>
      */
     public function jsonSerialize(): array
@@ -194,17 +178,6 @@ class ImportUserRecord implements JsonSerializable
             'customAttributes' => $customClaims,
             'validSince' => $tokensValidAfterTime,
         ];
-
-        foreach ($this->providers as $providerData) {
-            $record['providerUserInfo'][] = [
-                'providerId' => $providerData->providerId,
-                'displayName' => $providerData->displayName,
-                'photoUrl' => $providerData->photoUrl,
-                'email' => $providerData->email,
-                'rawId' => $providerData->uid,
-                'phoneNumber' => $providerData->phoneNumber,
-            ];
-        }
 
         return array_filter(
             $record,
