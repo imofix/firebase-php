@@ -184,12 +184,12 @@ class ImportUserRecord implements JsonSerializable
 
         $record = [
             'localId' => $this->uid->value,
-            'email' => $this->email->value,
+            'email' => $this->email?->value,
             'emailVerified' => $this->emailVerified,
             'displayName' => $this->displayName,
             'disabled' => $disableUser,
             'phoneNumber' => $this->phoneNumber,
-            'photoUrl' => $this->photoUrl->value,
+            'photoUrl' => $this->photoUrl?->value,
             'customAttributes' => $customClaims,
             'validSince' => $tokensValidAfterTime,
         ];
