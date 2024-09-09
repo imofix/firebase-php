@@ -11,9 +11,6 @@ use Kreait\Firebase\Exception\FirestoreApiExceptionConverter;
 use Kreait\Firebase\Exception\FirestoreException;
 use Throwable;
 
-/**
- * @internal
- */
 class ApiClient
 {
     private readonly FirestoreApiExceptionConverter $errorHandler;
@@ -31,8 +28,10 @@ class ApiClient
      *
      * @throws FirebaseException
      * @throws FirestoreException
+     *
+     * @return mixed
      */
-    public function get(string $path, array $options = []): mixed
+    public function get(string $path, array $options = [])
     {
         return $this->requestApi('GET', $path, $options);
     }
@@ -43,8 +42,10 @@ class ApiClient
      *
      * @throws FirebaseException
      * @throws FirestoreException
+     *
+     * @return mixed
      */
-    public function patch(string $path, array $data, array $options = []): mixed
+    public function patch(string $path, array $data, array $options = [])
     {
         $options['json'] = $data;
 
@@ -56,8 +57,10 @@ class ApiClient
      *
      * @throws FirestoreException
      * @throws FirebaseException
+     *
+     * @return mixed
      */
-    private function requestApi(string $method, string $uri, array $options = []): mixed
+    private function requestApi(string $method, string $uri, array $options = [])
     {
         try {
             $response = $this->client->request($method, $uri, $options);
