@@ -20,7 +20,7 @@ $database->patch(
             'modifiedOn' => [
                 'timestampValue' => [
                     'seconds' => (new \DateTimeImmutable())->format('U'),
-                ]
+                ],
             ],
             'members' => [
                 'arrayValue' => [
@@ -46,5 +46,5 @@ $database->patch(
     ],
     [
         'query' => 'updateMask.fieldPaths=modifiedOn&updateMask.fieldPaths=members',
-    ]
+    ],
 );

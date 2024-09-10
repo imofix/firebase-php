@@ -9,9 +9,9 @@ use InvalidArgumentException;
 use Kreait\Firebase\Auth\ActionCodeSettings;
 use Kreait\Firebase\Auth\CreateActionLink\FailedToCreateActionLink;
 use Kreait\Firebase\Auth\CreateSessionCookie\FailedToCreateSessionCookie;
+use Kreait\Firebase\Auth\DeleteUsersResult;
 use Kreait\Firebase\Auth\ImportUserRecord;
 use Kreait\Firebase\Auth\ImportUsersResult;
-use Kreait\Firebase\Auth\DeleteUsersResult;
 use Kreait\Firebase\Auth\SendActionLink\FailedToSendActionLink;
 use Kreait\Firebase\Auth\SignIn\FailedToSignIn;
 use Kreait\Firebase\Auth\SignInResult;
@@ -28,7 +28,6 @@ use Kreait\Firebase\Exception\Auth\RevokedSessionCookie;
 use Kreait\Firebase\Exception\Auth\UserDisabled;
 use Kreait\Firebase\Exception\Auth\UserNotFound;
 use Kreait\Firebase\Request;
-use Kreait\Firebase\Util\JSON;
 use Kreait\Firebase\Request\CreateUser;
 use Kreait\Firebase\Request\UpdateUser;
 use Lcobucci\JWT\Token;
@@ -189,12 +188,11 @@ interface Auth
      * @see https://cloud.google.com/identity-platform/docs/reference/rest/v1/projects.accounts/batchCreate
      *
      * @param array<ImportUserRecord> $users
-     * @param array<string, mixed> $options
      *
      * @throws Exception\AuthException
      * @throws Exception\FirebaseException
      */
-    public function importUsers(array $users, array $options = []): ImportUsersResult;
+    public function importUsers(array $users, bool $allowOverwrite = false): ImportUsersResult;
 
     /**
      * @param non-empty-string $type

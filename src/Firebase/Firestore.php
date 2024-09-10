@@ -11,7 +11,6 @@ use Kreait\Firebase\Firestore\ApiClient;
  */
 final class Firestore implements Contract\Firestore
 {
-
     private function __construct(private readonly ApiClient $apiClient)
     {
     }
@@ -23,6 +22,6 @@ final class Firestore implements Contract\Firestore
 
     public function database(): ApiClient
     {
-        return $this->client;
+        return $this->apiClient;
     }
 }
